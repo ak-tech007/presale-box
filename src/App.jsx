@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import CountdownTimer from './components/CountdownTimer';
+
 
 function App() {
   const [ethValue, setEthValue] = useState(0);
@@ -17,24 +19,7 @@ function App() {
         <h2 className="mb-4 text-3xl font-extrabold">BUY $STARS IN PRESALE!</h2>
 
         {/*  Countdown Timer */}
-        <div className="mb-4 flex justify-between rounded-xl border-4 border-dashed border-gray-500 bg-purple-800 p-4 text-center text-lg font-extrabold">
-          <div>
-            <p className="text-xl">01</p>
-            <p className="text-sm">DAYS</p>
-          </div>
-          <div>
-            <p className="text-xl">14</p>
-            <p className="text-sm">HOURS</p>
-          </div>
-          <div>
-            <p className="text-xl">26</p>
-            <p className="text-sm">MINUTES</p>
-          </div>
-          <div>
-            <p className="text-xl">13</p>
-            <p className="text-sm">SECONDS</p>
-          </div>
-        </div>
+        <CountdownTimer />
 
         {/*  Funding Progress */}
         <div className="mb-2 text-2xl font-extrabold">$1,262,656.29 / $1,485,103</div>
