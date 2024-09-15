@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 import CountdownTimer from './components/CountdownTimer';
+import { useAccount, useDisconnect, useBalance } from 'wagmi'
 
 
 
@@ -8,6 +10,10 @@ function App() {
   const [ethValue, setEthValue] = useState(0);
   const [starsValue, setStarsValue] = useState(0);
   const { open } = useWeb3Modal()
+  const { address, chainId } = useAccount()
+  const { data: balance } = useBalance({
+    address,
+  })
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-blue-500 p-6">
@@ -88,7 +94,30 @@ function App() {
         </div>
 
         {/*  Connect Wallet Button */}
-        <button className="w-full rounded-lg border-b-4 border-pink-700 bg-pink-500 p-4 font-bold shadow hover:shadow-lg active:border-pink-900" onClick={() => open()}>CONNECT WALLET</button>
+        {
+          address ? (
+            <>
+              {/* when the user is connected */}
+              <div className="flex flex-col items-center space-y-4">
+                <div className="w-full">
+                  <button className="w-full rounded-lg bg-cyan-400 p-4 text-lg font-bold text-gray-900 hover:bg-cyan-500 active:bg-cyan-600">
+                    BUY AND STAKE FOR 11772% REWARDS
+                  </button>
+                </div>
+                <div className="w-full">
+                  <button className="w-full rounded-lg bg-pink-500 p-4 text-lg font-bold text-white shadow-lg hover:bg-pink-600 active:bg-pink-700">
+                    BUY NOW!
+                  </button>
+                </div>
+              </div>
+            </>
+          ) : (
+            <button className="w-full rounded-lg border-b-4 border-pink-700 bg-pink-500 p-4 font-bold shadow hover:shadow-lg active:border-pink-900" onClick={() => open()}>
+              CONNECT WALLET
+            </button>
+          )
+        }
+
 
         {/*  Wallet Link */}
         <p className="mt-4 text-sm">
