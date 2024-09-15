@@ -186,7 +186,12 @@ function App() {
           {/* Pay with ETH and Receive $STARS */}
           <div className="mb-2 flex justify-between text-sm text-white">
             <span>Pay with ETH</span>
-            <span>Max</span>
+            <button
+                className="text-red-500 font-bold py-1 px-2 rounded"
+                onClick={() => setInputValue(parseFloat(nativeFormatted).toFixed(3))}
+              >
+                Max
+              </button>
             <span>Receive $STARS</span>
           </div>
           <div className="relative mb-6 flex space-x-4 items-center">
