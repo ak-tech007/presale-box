@@ -19,14 +19,32 @@ function App() {
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState('ETH')
-  const [inputValue, setInputValue] = useState(address ? parseFloat(balance?.formatted).toFixed(3) : "0");
+  const [inputValue, setInputValue] = useState('');
   const [ethPrice, setEthPrice] = useState(0n)
-  const modalRef = useRef(null);
+  const [isBuyDirectlyActive, setIsBuyDirectlyActive] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(600); 
+  
+  const modalRef = useRef(null)
+
+  const {
+    nativeBalance: nativeBalance,
+    tokenBalance: tokenBalance,
+    decimals: tokenDeciamls,
+    nativeFormatted: nativeFormatted,
+    tokenFormatted: tokenFormatted,
+    refetch: refetchToken,
+  } = useToken(selectedToken)
 
   const handleSelectToken = (token) => {
     setSelectedToken(token);
     setIsModalOpen(false)
   };
+
+  const handleBuyDirectly = () => {
+    setIsBuyDirectlyActive(true)
+    setTimeLeft(600)
+  };
+
 
   const handleClickOutside = (e) => {
     if (modalRef.current && !modalRef.current.contains(e.target)) {
@@ -41,18 +59,43 @@ function App() {
     };
   }, []);
 
-  const {
-    nativeBalance: nativeBalance,
-    tokenBalance: tokenBalance,
-    decimals: tokenDeciamls,
-    nativeFormatted: nativeFormatted,
-    tokenFormatted: tokenFormatted,
-    refetch: refetchToken,
-  } = useToken(selectedToken)
+  useEffect(() => {
+    let timer;
+    if (isBuyDirectlyActive && timeLeft > 0) {
+      timer = setInterval(() => {
+        setTimeLeft((prevTime) => prevTime - 1);
+      }, 1000);
+    } else if (timeLeft <= 0) {
+      setIsBuyDirectlyActive(false)
+    }
+    return () => clearInterval(timer)
+  }, [isBuyDirectlyActive, timeLeft])
+
+  useEffect(() => {
+    if (address && ethPrice) {
+      if(!nativeBalance || nativeBalance === "0") return
+
+      const initialValue = parseFloat(nativeFormatted).toFixed(3);
+      setInputValue(initialValue);
+
+      const _totalStars = BN(ethPrice).multipliedBy(initialValue.toString()).div(starsValue)
+      console.log("total stars : ", _totalStars.toString())
+      if(_totalStars) setTotalStars(_totalStars.toFixed(0))
+
+    }
+  }, [address, balance, refetchToken, ethPrice]);
+
+
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  };
 
   const getETHPrice = async () => {
    try {
-      const provider = new ethers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P")
+      const provider = new ethers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // eth mainnet
       const dataFeed = new ethers.Contract("0x49e9C82E586B93F3c5cAd581e1A6BbA714E2c4Ca", abis.ChainlinkPriceFeed, provider)
       let ethPrice = 0n
       try {
@@ -85,7 +128,7 @@ function App() {
     
     const inputValue = e.target.value;
     const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
-    if(_totalStars) setTotalStars(_totalStars.toString())
+    if(_totalStars) setTotalStars(_totalStars.toFixed(0))
     console.log("total stars : ", _totalStars.toString())
   };
   
@@ -153,13 +196,13 @@ function App() {
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
-                className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 text-lg font-bold text-white placeholder-white focus:outline-none"
+                className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 font-bold text-white placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
                 <img
                   src={selectedToken === 'ETH' ? '/ETH.svg' : '/USDT.svg'}
                   alt={selectedToken}
-                  className="h-5 w-5"
+                  className="h-4 w-4"
                 />
                 <span className="font-bold text-lg">{selectedToken}</span>
                 <button
@@ -194,12 +237,11 @@ function App() {
             <div className="relative w-full">
               <input
                 type="text"
-                value={totalStars ? totalStars : "0"}
-                // onChange={(e) => setStarsValue(e.target.value)}
-                className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 text-lg font-bold text-white placeholder-white focus:outline-none"
+                value={totalStars}
+                className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 font-bold text-white placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
-                <img src="/star.png" alt="$STARS" className="h-6 w-6" />
+                <img src="/star.png" alt="$STARS" className="h-4 w-4" />
                 <span className="text-lg font-bold">$STARS</span>
               </div>
             </div>
@@ -216,9 +258,22 @@ function App() {
                   </button>
                 </div>
                 <div className="w-full">
-                  <button className="w-full rounded-lg bg-pink-500 p-4 text-lg font-bold text-white shadow-lg hover:bg-pink-600 active:bg-pink-700">
-                    BUY NOW!
-                  </button>
+                  {/* Buy Directly Button */}
+                    <button
+                      className="w-full mb-4 rounded-lg bg-yellow-500 p-4 text-lg font-bold text-gray-900 hover:bg-yellow-600"
+                      onClick={handleBuyDirectly}
+                    >
+                      Buy Directly
+                    </button>
+
+                    {isBuyDirectlyActive && (
+                      <div className="mb-4 bg-white p-4 text-gray-900 rounded-lg">
+                        <p className="mb-2 text-lg font-bold">Send ETH or Tether to the following address:</p>
+                        <p className="mb-2 text-base">0x0eA21a0e301A0296F39426cD0433b93AAD31cE3a</p>
+                        <p className="mb-2 text-red-600 font-bold">Only send ETH mainnet or Tether on Ethereum!</p>
+                        <p className="mb-4 text-lg font-bold text-blue-700">Time left: {formatTime(timeLeft)}</p>
+                      </div>
+                    )}
                 </div>
               </div>
             </>
@@ -228,15 +283,6 @@ function App() {
             </button>
           )}
 
-          {/* Wallet Link */}
-          <p className="mt-4 text-sm">
-            <a href="#" className="text-blue-200 underline">Don't have a wallet?</a>
-          </p>
-
-          {/* Powered by Web3Payments */}
-          <div className="mt-2 text-xs text-blue-200">
-            Powered by <b>Web3Payments</b>
-          </div>
         </div>
       </div>
   );
