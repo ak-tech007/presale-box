@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const PaymentModal = ({ onSelectToken }) => {
+const PaymentModal = ({ onSelectToken, nativeFormatted, tokenFormatted  }) => {
   const [selectedToken, setSelectedToken] = useState('ETH'); // ETH-USDT
   const [isOpen, setIsOpen] = useState(true)
 
@@ -17,15 +17,17 @@ const PaymentModal = ({ onSelectToken }) => {
       <TokenSelector 
         selectedToken={selectedToken} 
         handleSelectToken={handleSelectToken} 
+        nativeFormatted={nativeFormatted} 
+        tokenFormatted={tokenFormatted} 
       />   
     </div>
   );
 };
 
-const TokenSelector = ({ selectedToken, handleSelectToken }) => {
+const TokenSelector = ({ selectedToken, handleSelectToken, nativeFormatted, tokenFormatted  }) => {
   const tokens = [
-    { name: 'Ethereum', symbol: 'ETH', icon: '/ETH.svg', balance: 0.04 },
-    { name: 'Tether', symbol: 'USDT', icon: '/USDT.svg', balance: 6.307 },
+    { name: 'Ethereum', symbol: 'ETH', icon: '/ETH.svg', balance: nativeFormatted },
+    { name: 'Tether', symbol: 'USDT', icon: '/USDT.svg', balance: tokenFormatted },
   ];
 
   return (
