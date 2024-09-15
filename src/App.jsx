@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useWeb3Modal } from '@web3modal/wagmi/react'
 import CountdownTimer from './components/CountdownTimer';
+
 
 
 function App() {
   const [ethValue, setEthValue] = useState(0);
   const [starsValue, setStarsValue] = useState(0);
+  const { open } = useWeb3Modal()
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-blue-500 p-6">
@@ -85,7 +88,7 @@ function App() {
         </div>
 
         {/*  Connect Wallet Button */}
-        <button className="w-full rounded-lg border-b-4 border-pink-700 bg-pink-500 p-4 font-bold shadow hover:shadow-lg active:border-pink-900">CONNECT WALLET</button>
+        <button className="w-full rounded-lg border-b-4 border-pink-700 bg-pink-500 p-4 font-bold shadow hover:shadow-lg active:border-pink-900" onClick={() => open()}>CONNECT WALLET</button>
 
         {/*  Wallet Link */}
         <p className="mt-4 text-sm">
