@@ -9,11 +9,6 @@ import { useQuery } from '@tanstack/react-query'
 import { ethers } from 'ethers';
 import BN from 'bignumber.js'
 
-
-
-
-
-
 function App() {
   const [starsValue, setStarsValue] = useState(0);
   const { open } = useWeb3Modal()
@@ -23,7 +18,7 @@ function App() {
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState('ETH')
-  const [ethValue, setEthValue] = useState(address ? parseFloat(balance?.formatted).toFixed(3) : "0");
+  const [inputValue, setInputValue] = useState(address ? parseFloat(balance?.formatted).toFixed(3) : "0");
   const [ethPrice, setEthPrice] = useState(0n)
   const modalRef = useRef(null);
 
@@ -146,8 +141,8 @@ function App() {
             <div className="relative w-full">
               <input
                 type="text"
-                value={!address ? "0" : selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3)}
-                onChange={(e) => setEthValue(e.target.value)}
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
                 className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 text-lg font-bold text-white placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
