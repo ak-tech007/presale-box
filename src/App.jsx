@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, Suspense } from 'react';
 import { useWeb3Modal } from '@web3modal/wagmi/react'
 import CountdownTimer from './components/CountdownTimer';
 import { useAccount, useDisconnect, useBalance, useReadContracts} from 'wagmi'
@@ -10,7 +10,8 @@ import { ethers } from 'ethers';
 import BN from 'bignumber.js'
 
 function App() {
-  const [starsValue, setStarsValue] = useState(0);
+  const [starsValue, setStarsValue] = useState("0.0014419");
+  const [totalStars, setTotalStars] = useState("0")
   const { open } = useWeb3Modal()
   const { address, chainId } = useAccount()
   const { data: balance } = useBalance({
@@ -61,7 +62,7 @@ function App() {
       }
       console.log("eth price : ", ethPrice)
 
-      const price = BN(ethPrice.toString()).div(1e8).toString()
+      const price = BN(ethPrice.toString()).div(1e8).toFixed(0)
       return price
    } catch(e) {
       console.log("error getETHPrice: ", e)
@@ -79,6 +80,15 @@ function App() {
     if (data) setEthPrice(data)
   }, [data, isLoading])
 
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+    
+    const inputValue = e.target.value;
+    const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
+    if(_totalStars) setTotalStars(_totalStars.toString())
+    console.log("total stars : ", _totalStars.toString())
+  };
+  
 
   return (
      <div className="flex-col min-h-screen bg-blue-500 p-6">
@@ -114,7 +124,7 @@ function App() {
           <div className="mb-4 text-sm font-bold text-blue-200">UNTIL PRICE INCREASE</div>
 
           {/* Token Price */}
-          <div className="mb-6 text-lg font-bold">1 $STARS = $0.0014419</div>
+          <div className="mb-6 text-lg font-bold">1 $STARS = ${starsValue}</div>
 
           {/* Purchased and Stakeable Info */}
           <div className="mb-6 flex justify-between space-x-4 text-lg">
@@ -142,7 +152,7 @@ function App() {
               <input
                 type="text"
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
+                onChange={handleInputChange}
                 className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 text-lg font-bold text-white placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
@@ -184,8 +194,8 @@ function App() {
             <div className="relative w-full">
               <input
                 type="text"
-                value={starsValue}
-                onChange={(e) => setStarsValue(e.target.value)}
+                value={totalStars ? totalStars : "0"}
+                // onChange={(e) => setStarsValue(e.target.value)}
                 className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 text-lg font-bold text-white placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
