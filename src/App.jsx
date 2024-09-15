@@ -4,6 +4,12 @@ import CountdownTimer from './components/CountdownTimer';
 import { useAccount, useDisconnect, useBalance, useReadContracts} from 'wagmi'
 import PaymentModal from './components/PaymentModal';
 import { useToken } from './hooks/useToken';
+import abis from './utils/abis.json'
+import { useQuery } from '@tanstack/react-query'
+import { ethers } from 'ethers';
+import BN from 'bignumber.js'
+
+
 
 
 
@@ -18,6 +24,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState('ETH')
   const [ethValue, setEthValue] = useState(address ? parseFloat(balance?.formatted).toFixed(3) : "0");
+  const [ethPrice, setEthPrice] = useState(0n)
   const modalRef = useRef(null);
 
   const handleSelectToken = (token) => {
@@ -46,6 +53,37 @@ function App() {
     tokenFormatted: tokenFormatted,
     refetch: refetchToken,
   } = useToken(selectedToken)
+
+  const getETHPrice = async () => {
+   try {
+      const provider = new ethers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P")
+      const dataFeed = new ethers.Contract("0x49e9C82E586B93F3c5cAd581e1A6BbA714E2c4Ca", abis.ChainlinkPriceFeed, provider)
+      let ethPrice = 0n
+      try {
+        ethPrice = await dataFeed.getChainlinkDataFeedLatestAnswer()
+      } catch (e) {
+        return console.log('Error getting eth price')
+      }
+      console.log("eth price : ", ethPrice)
+
+      const price = BN(ethPrice.toString()).div(1e8).toString()
+      return price
+   } catch(e) {
+      console.log("error getETHPrice: ", e)
+   }
+  }
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['ethPrice'],
+    queryFn: getETHPrice,
+    refetchInterval: 5000,
+  }) 
+
+  useEffect(() => {
+    if (isLoading) return
+    if (data) setEthPrice(data)
+  }, [data, isLoading])
+
 
   return (
      <div className="flex-col min-h-screen bg-blue-500 p-6">
