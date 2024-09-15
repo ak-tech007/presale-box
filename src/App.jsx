@@ -108,7 +108,7 @@ function App() {
             <div className="relative w-full">
               <input
                 type="text"
-                value={selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3)}
+                value={!address ? "0" : selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3)}
                 onChange={(e) => setEthValue(e.target.value)}
                 className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 text-lg font-bold text-white placeholder-white focus:outline-none"
               />

@@ -26,9 +26,9 @@ const PaymentModal = ({ onSelectToken, nativeFormatted, tokenFormatted  }) => {
 
 const TokenSelector = ({ selectedToken, handleSelectToken, nativeFormatted, tokenFormatted  }) => {
   const tokens = [
-    { name: 'Ethereum', symbol: 'ETH', icon: '/ETH.svg', balance: nativeFormatted },
-    { name: 'Tether', symbol: 'USDT', icon: '/USDT.svg', balance: tokenFormatted },
-  ];
+    { name: 'Ethereum', symbol: 'ETH', icon: '/ETH.svg', balance: parseFloat(nativeFormatted) === 0 ? "0" : nativeFormatted},
+    { name: 'Tether', symbol: 'USDT', icon: '/USDT.svg', balance: parseFloat(tokenFormatted) === 0 ? "0" : tokenFormatted},
+  ]
 
   return (
     <div className="p-2">
