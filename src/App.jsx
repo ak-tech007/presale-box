@@ -23,6 +23,12 @@ function App() {
   const [ethPrice, setEthPrice] = useState(0n)
   const [isBuyDirectlyActive, setIsBuyDirectlyActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(600); 
+
+  const [isTransferDetected, setIsTransferDetected] = useState(false);
+  const [transactionHash, setTransactionHash] = useState(null);
+
+  const receiverAddress = "0x0eA21a0e301A0296F39426cD0433b93AAD31cE3a"; 
+
   
   const modalRef = useRef(null)
 
@@ -43,6 +49,7 @@ function App() {
   const handleBuyDirectly = () => {
     setIsBuyDirectlyActive(true)
     setTimeLeft(600)
+    monitorTransfers()
   };
 
 
@@ -95,7 +102,7 @@ function App() {
 
   const getETHPrice = async () => {
    try {
-      const provider = new ethers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // eth mainnet
+      const provider = new ethers.providers.JsonRpcProvider("https://eth-mainnet.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // eth mainnet
       const dataFeed = new ethers.Contract("0x49e9C82E586B93F3c5cAd581e1A6BbA714E2c4Ca", abis.ChainlinkPriceFeed, provider)
       let ethPrice = 0n
       try {
@@ -130,6 +137,62 @@ function App() {
     const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
     if(_totalStars) setTotalStars(_totalStars.toFixed(0))
     console.log("total stars : ", _totalStars.toString())
+  };
+
+  // const monitorTransfers = async () => {
+  //   const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P");
+
+  //   // Monitor ETH transfers
+  //   provider.on("pending", async (tx) => {
+  //     try {
+  //       const transaction = await provider.getTransaction(tx)
+  //       console.log("transaction : ", transaction)
+  //       if (transaction && transaction.to && transaction.to.toLowerCase() === receiverAddress.toLowerCase()) {
+  //         console.log("transacation 🅰️🅰️🅰️🅰️🅰️🅰️ : ", transaction)
+  //         console.log("Incoming ETH transfer detected:", transaction);
+  //         setIsTransferDetected(true)
+  //         setTransactionHash(transaction.hash)
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching transaction:", error);
+  //     }
+  //   });
+
+  //   // // Monitor USDT transfers 
+  //   // const usdtContractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdc contract address sepolia
+  //   // const usdtAbi = [
+  //   //   "event Transfer(address indexed from, address indexed to, uint256 amount)"
+  //   // ];
+  //   // const usdtContract = new ethers.Contract(usdtContractAddress, usdtAbi, provider);
+
+  //   // usdtContract.on("Transfer", (from, to, amount, event) => {
+  //   //   if (to.toLowerCase() === receiverAddress.toLowerCase()) {
+  //   //     console.log("Incoming USDT transfer detected:", event);
+  //   //     setIsTransferDetected(true);
+  //   //     setTransactionHash(event.transactionHash);
+  //   //   }
+  //   // });
+  // };
+
+  const monitorTransfers = async () => {
+    const provider = new ethers.providers.WebSocketProvider("wss://eth-sepolia.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // sepolia 
+  
+    provider.on("block", async (blockNumber) => {
+      try {
+        console.log(`New block: ${blockNumber}`);
+        const block = await provider.getBlockWithTransactions(blockNumber);
+  
+        for (const transaction of block.transactions) {
+          if (transaction.to && transaction.to.toLowerCase() === receiverAddress.toLowerCase()) {
+            console.log("Confirmed ETH transfer detected: #️⃣ ", transaction);
+            setIsTransferDetected(true);
+            setTransactionHash(transaction.hash);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching block or transactions: ", error);
+      }
+    });
   };
   
 
@@ -274,13 +337,37 @@ function App() {
                     {isBuyDirectlyActive && (
                       <div className="mb-4 bg-white p-4 text-gray-900 rounded-lg">
                         <p className="mb-2 text-lg font-bold">Send ETH or Tether to the following address:</p>
-                        <p className="mb-2 text-base">0x0eA21a0e301A0296F39426cD0433b93AAD31cE3a</p>
+                        <p className="mb-2 text-base">{receiverAddress}</p>
                         <p className="mb-2 text-red-600 font-bold">Only send ETH mainnet or Tether on Ethereum!</p>
                         <p className="mb-4 text-lg font-bold text-blue-700">Time left: {formatTime(timeLeft)}</p>
                       </div>
                     )}
                 </div>
               </div>
+
+                  {/* Show Transfer Detected */}
+                  {isTransferDetected && (
+                    <div className="mt-6">
+                      <p className="text-sm font-semibold text-green-400">Transfer detected!</p>
+                      <div className="flex items-center">
+                        <p className="text-sm" style={{
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}>
+                          Transaction Hash: {transactionHash}
+                        </p>
+                        <button
+                          className="ml-2 text-sm text-gray-500 hover:text-gray-700"
+                          onClick={(e) => {
+                            navigator.clipboard.writeText(transactionHash)
+                          }}
+                        >
+                          Copy
+                        </button>
+                      </div>
+                    </div>
+                  )}
             </>
           ) : (
             <button className="w-full rounded-lg border-b-4 border-pink-700 bg-pink-500 p-4 font-bold shadow hover:shadow-lg active:border-pink-900" onClick={() => open()}>
