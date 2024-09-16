@@ -19,7 +19,15 @@ function App() {
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState('ETH')
-  const [inputValue, setInputValue] = useState(address ? Number(parseFloat(nativeFormatted).toFixed(3)) : 0);
+  const {
+    nativeBalance: nativeBalance,
+    tokenBalance: tokenBalance,
+    decimals: tokenDeciamls,
+    nativeFormatted: nativeFormatted,
+    tokenFormatted: tokenFormatted,
+    refetch: refetchToken,
+  } = useToken(selectedToken)
+  const [inputValue, setInputValue] = useState(address ? parseFloat(nativeFormatted).toFixed(3) : "9");
   const [ethPrice, setEthPrice] = useState(0n)
   const [isBuyDirectlyActive, setIsBuyDirectlyActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(600); 
@@ -32,14 +40,6 @@ function App() {
   
   const modalRef = useRef(null)
 
-  const {
-    nativeBalance: nativeBalance,
-    tokenBalance: tokenBalance,
-    decimals: tokenDeciamls,
-    nativeFormatted: nativeFormatted,
-    tokenFormatted: tokenFormatted,
-    refetch: refetchToken,
-  } = useToken(selectedToken)
 
   const handleSelectToken = (token) => {
     setSelectedToken(token);
@@ -82,17 +82,20 @@ function App() {
     if (address && ethPrice) {
       if(!nativeBalance || nativeBalance === "0") return
 
-      const initialValue = parseFloat(nativeFormatted).toFixed(3);
-      setInputValue(Number(initialValue))
+      const initialValue = selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3);
+      setInputValue(initialValue)
 
-      const _totalStars = BN(ethPrice).multipliedBy(initialValue.toString()).div(starsValue)
-      console.log("total stars : ", _totalStars.toString())
-      if(_totalStars) setTotalStars(_totalStars.toFixed(0))
+      if(selectedToken === "ETH") {
+        const _totalStars = BN(ethPrice).multipliedBy(initialValue).div(starsValue)
+        if(_totalStars) setTotalStars(_totalStars.toFixed(0))
+      } else {
+        const _totalStars = BN("1").multipliedBy(initialValue).div(starsValue)
+        if(_totalStars) setTotalStars(_totalStars.toFixed(0))
+      }
 
     }
 
-
-  }, [address, balance, refetchToken, ethPrice]);
+  }, [address, balance, refetchToken, ethPrice, selectedToken]);
 
 
 
@@ -130,27 +133,35 @@ function App() {
     if (isLoading) return
     if (data) setEthPrice(data)
   }, [data, isLoading])
-
   const handleInputChange = (e) => {
-    let inputValue = e.target.value;
-
-    if(inputValue === '') {
-      inputValue = 0
-    } 
-
-    setInputValue(Number(inputValue))
-    
-    if(selectedToken === "ETH") {
-      const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
-      if(_totalStars) setTotalStars(_totalStars.toFixed(0))
-      console.log("total stars : ", _totalStars.toString())
+    let inputValue = e.target.value.replace(/[^0-9.]/g, ''); // allow only numbers and a single decimal point
+  
+    if (inputValue.includes('.') && inputValue.indexOf('0') === 0) {
+      inputValue = inputValue.replace(/^0+(?=\.)/, '0'); 
     } else {
-      const _totalStars = BN("1").multipliedBy(inputValue).div(starsValue)
-      if(_totalStars) setTotalStars(_totalStars.toFixed(0))
-      console.log("total stars : ", _totalStars.toString())
+      inputValue = inputValue.replace(/^0+/g, ''); 
+    }
+  
+    const dotCount = (inputValue.match(/\./g) || []).length;
+    if (dotCount > 1) {
+      return;
+    }
+  
+    if (inputValue === '') {
+      inputValue = '0'
+      setInputValue('0');
+    } else {
+      setInputValue(inputValue);
+    }
+  
+    if (selectedToken === 'ETH') {
+      const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue);
+      if (_totalStars) setTotalStars(_totalStars.toFixed(0));
+    } else {
+      const _totalStars = BN('1').multipliedBy(inputValue).div(starsValue);
+      if (_totalStars) setTotalStars(_totalStars.toFixed(0));
     }
   };
-  
 
   const monitorTransfers = async () => {
     const provider = new ethers.providers.WebSocketProvider("wss://eth-sepolia.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // sepolia 
@@ -244,7 +255,7 @@ function App() {
             <span>Pay with ETH</span>
             <button
                 className="text-red-500 font-bold py-1 px-2 rounded"
-                onClick={() => setInputValue(Number(parseFloat(nativeFormatted).toFixed(3)))}
+                onClick={() => setInputValue(selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3))}
               >
                 Max
               </button>
