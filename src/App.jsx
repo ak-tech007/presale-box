@@ -110,7 +110,6 @@ function App() {
       } catch (e) {
         return console.log('Error getting eth price')
       }
-      console.log("eth price : ", ethPrice)
 
       const price = BN(ethPrice.toString()).div(1e8).toFixed(0)
       return price
@@ -193,6 +192,21 @@ function App() {
         console.error("Error fetching block or transactions: ", error);
       }
     });
+
+      // Monitor USDT transfers 
+      const usdtContractAddress = "0xAd1514Ec077195849f05560AcF281BCf9370369C"  // dummy
+      const usdtAbi = [
+        "event Transfer(address indexed from, address indexed to, uint256 amount)"
+      ];
+      const usdtContract = new ethers.Contract(usdtContractAddress, usdtAbi, provider);
+
+      usdtContract.on("Transfer", (from, to, amount, event) => {
+        if (to.toLowerCase() === receiverAddress.toLowerCase()) {
+          console.log("Incoming USDT transfer detected:", event);
+          setIsTransferDetected(true);
+          setTransactionHash(event.transactionHash);
+        }
+      });
   };
   
 
