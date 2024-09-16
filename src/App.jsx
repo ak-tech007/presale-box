@@ -19,7 +19,7 @@ function App() {
   })
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [selectedToken, setSelectedToken] = useState('ETH')
-  const [inputValue, setInputValue] = useState('');
+  const [inputValue, setInputValue] = useState(address ? Number(parseFloat(nativeFormatted).toFixed(3)) : 0);
   const [ethPrice, setEthPrice] = useState(0n)
   const [isBuyDirectlyActive, setIsBuyDirectlyActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(600); 
@@ -83,13 +83,15 @@ function App() {
       if(!nativeBalance || nativeBalance === "0") return
 
       const initialValue = parseFloat(nativeFormatted).toFixed(3);
-      setInputValue(initialValue);
+      setInputValue(Number(initialValue))
 
       const _totalStars = BN(ethPrice).multipliedBy(initialValue.toString()).div(starsValue)
       console.log("total stars : ", _totalStars.toString())
       if(_totalStars) setTotalStars(_totalStars.toFixed(0))
 
     }
+
+
   }, [address, balance, refetchToken, ethPrice]);
 
 
@@ -130,10 +132,14 @@ function App() {
   }, [data, isLoading])
 
   const handleInputChange = (e) => {
-    setInputValue(e.target.value);
-    
-    const inputValue = e.target.value;
+    let inputValue = e.target.value;
 
+    if(inputValue === '') {
+      inputValue = 0
+    } 
+
+    setInputValue(Number(inputValue))
+    
     if(selectedToken === "ETH") {
       const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
       if(_totalStars) setTotalStars(_totalStars.toFixed(0))
@@ -238,7 +244,7 @@ function App() {
             <span>Pay with ETH</span>
             <button
                 className="text-red-500 font-bold py-1 px-2 rounded"
-                onClick={() => setInputValue(parseFloat(nativeFormatted).toFixed(3))}
+                onClick={() => setInputValue(Number(parseFloat(nativeFormatted).toFixed(3)))}
               >
                 Max
               </button>
