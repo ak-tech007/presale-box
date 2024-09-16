@@ -133,45 +133,18 @@ function App() {
     setInputValue(e.target.value);
     
     const inputValue = e.target.value;
-    const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
-    if(_totalStars) setTotalStars(_totalStars.toFixed(0))
-    console.log("total stars : ", _totalStars.toString())
+
+    if(selectedToken === "ETH") {
+      const _totalStars = BN(ethPrice).multipliedBy(inputValue).div(starsValue)
+      if(_totalStars) setTotalStars(_totalStars.toFixed(0))
+      console.log("total stars : ", _totalStars.toString())
+    } else {
+      const _totalStars = BN("1").multipliedBy(inputValue).div(starsValue)
+      if(_totalStars) setTotalStars(_totalStars.toFixed(0))
+      console.log("total stars : ", _totalStars.toString())
+    }
   };
-
-  // const monitorTransfers = async () => {
-  //   const provider = new ethers.JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P");
-
-  //   // Monitor ETH transfers
-  //   provider.on("pending", async (tx) => {
-  //     try {
-  //       const transaction = await provider.getTransaction(tx)
-  //       console.log("transaction : ", transaction)
-  //       if (transaction && transaction.to && transaction.to.toLowerCase() === receiverAddress.toLowerCase()) {
-  //         console.log("transacation 🅰️🅰️🅰️🅰️🅰️🅰️ : ", transaction)
-  //         console.log("Incoming ETH transfer detected:", transaction);
-  //         setIsTransferDetected(true)
-  //         setTransactionHash(transaction.hash)
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching transaction:", error);
-  //     }
-  //   });
-
-  //   // // Monitor USDT transfers 
-  //   // const usdtContractAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7" // usdc contract address sepolia
-  //   // const usdtAbi = [
-  //   //   "event Transfer(address indexed from, address indexed to, uint256 amount)"
-  //   // ];
-  //   // const usdtContract = new ethers.Contract(usdtContractAddress, usdtAbi, provider);
-
-  //   // usdtContract.on("Transfer", (from, to, amount, event) => {
-  //   //   if (to.toLowerCase() === receiverAddress.toLowerCase()) {
-  //   //     console.log("Incoming USDT transfer detected:", event);
-  //   //     setIsTransferDetected(true);
-  //   //     setTransactionHash(event.transactionHash);
-  //   //   }
-  //   // });
-  // };
+  
 
   const monitorTransfers = async () => {
     const provider = new ethers.providers.WebSocketProvider("wss://eth-sepolia.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // sepolia 
