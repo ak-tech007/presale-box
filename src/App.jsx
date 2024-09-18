@@ -35,7 +35,7 @@ function App() {
   const [isTransferDetected, setIsTransferDetected] = useState(false);
   const [transactionHash, setTransactionHash] = useState(null);
 
-  const receiverAddress = "0x0eA21a0e301A0296F39426cD0433b93AAD31cE3a"; 
+  const receiverAddress = "0x1c38701D43831836937d314F5aA0ea07BB837fbC"; 
 
   
   const modalRef = useRef(null)
@@ -165,17 +165,22 @@ function App() {
 
   const monitorTransfers = async () => {
     const provider = new ethers.providers.WebSocketProvider("wss://eth-sepolia.g.alchemy.com/v2/b-0GbsS8Vr_VNhENK0pl-0FKnqK38v-P") // sepolia 
-  
-    provider.on("block", async (blockNumber) => {
+    
+    let blockListener
+    blockListener =  provider.on("block", async (blockNumber) => {
       try {
         console.log(`New block: ${blockNumber}`);
         const block = await provider.getBlockWithTransactions(blockNumber);
-  
+
         for (const transaction of block.transactions) {
-          if (transaction.to && transaction.to.toLowerCase() === receiverAddress.toLowerCase()) {
-            console.log("Confirmed ETH transfer detected: #️⃣ ", transaction);
+          if (transaction.to && transaction.to.toLowerCase() === receiverAddress.toLowerCase() && transaction.value.gt(0)) {
+
+            console.log("Confirmed ETH transfer detected: #️⃣ ", transaction, "\n", transaction.value.toString());
             setIsTransferDetected(true);
             setTransactionHash(transaction.hash);
+
+            provider.off("block", blockListener);
+            break;
           }
         }
       } catch (error) {
@@ -184,19 +189,44 @@ function App() {
     });
 
       // Monitor USDT transfers 
-      const usdtContractAddress = "0xAd1514Ec077195849f05560AcF281BCf9370369C"  // dummy
+      const usdtContractAddress = "0x39aa0b4C5Bd18EF8CCC9392391447873AEe5E4Fb"  // dummy
+      const presaleContractAddress = receiverAddress
       const usdtAbi = [
         "event Transfer(address indexed from, address indexed to, uint256 amount)"
       ];
       const usdtContract = new ethers.Contract(usdtContractAddress, usdtAbi, provider);
+      const userPrivateKeyDummy = "9ff3a49bed31d91abdd9c915c62bf0ad1ee7cfbbfe880f4ad5c2681b06af9d06"
+      const wallet = new ethers.Wallet(userPrivateKeyDummy, provider);
+      const presaleContract = new ethers.Contract(presaleContractAddress, abis.Presale, wallet);
 
-      usdtContract.on("Transfer", (from, to, amount, event) => {
+      usdtContract.on("Transfer", async (from, to, amount, event) => {
+        provider.off("block", blockListener);
         if (to.toLowerCase() === receiverAddress.toLowerCase()) {
           console.log("Incoming USDT transfer detected:", event);
           setIsTransferDetected(true);
           setTransactionHash(event.transactionHash);
+
+          const participatedFilter = presaleContract.filters.Participated(from, null, null);
+
+          const participatedEvents = await presaleContract.queryFilter(participatedFilter, event.blockNumber, event.blockNumber);
+
+          if (participatedEvents.length > 0) {
+            const latestEvent = participatedEvents[participatedEvents.length - 1];
+            const eventAmount = ethers.utils.formatUnits(latestEvent.args.amount, decimals);
+
+            console.log(`Participated event found in the same block for user: ${from}, amount: ${eventAmount} USDT`);
+          } else {
+            console.log(`No Participated event found in the same block for user: ${from}`);
+
+            const tx = await presaleContract.handleTetherTransfer(from, amount)
+            await tx.wait()
+            
+            console.log("Participant added and amount sent successfully")
+          }
         }
       });
+
+
   };
   
 
