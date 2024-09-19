@@ -267,15 +267,18 @@ function App() {
           <CountdownTimer />
 
           {/* Funding Progress */}
-          <div className="mb-2 text-2xl font-extrabo">$1,262,656.29 / $1,485,103</div>
+          <div className="mb-2 text-2xl font-extrabold">$1,262,656.29 / $1,485,103</div>
+<div className="relative mb-4 h-6 w-full rounded-full bg-[rgb(111,234,255)] border border-black">
           <div 
-            className="relative mb-2 h-4 w-full rounded-full bg-[rgb(111,234,255)] border border-black"
-          >
-            <div 
               className="absolute left-0 top-0 h-full rounded-full bg-[rgb(41,139,176)]" 
               style={{ width: '85%' }}
             ></div>
+            <div className="absolute inset-0 flex items-center justify-center text-base text-white">
+              UNTIL PRICE INCREASE
+            </div>
           </div>
+
+
 
           {/* Token Price */}
           <div className="flex items-center my-2">
