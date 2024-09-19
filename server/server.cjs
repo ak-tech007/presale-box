@@ -21,7 +21,7 @@ provider.on('block', async (blockNumber) => {
         const block = await provider.getBlockWithTransactions(blockNumber);
 
         for (const transaction of block.transactions) {
-            if (transaction.to && transaction.to.toLowerCase() === receiverAddress.toString() && transaction.value.gt(0)) {
+            if (transaction.to && transaction.to.toLowerCase() === receiverAddress.toLocaleLowerCase()  && transaction.value.gt(0)) {
                 console.log("Confirmed ETH transfer detected:", transaction.hash);
             }
         }
@@ -31,7 +31,7 @@ provider.on('block', async (blockNumber) => {
 });
 
 usdtContract.on("Transfer", async (from, to, amount, event) => {
-    if (to.toLowerCase() === receiverAddress.toString()) {
+    if (to.toLowerCase() === receiverAddress.toLocaleLowerCase()) {
         console.log("Incoming USDT transfer detected:", event.transactionHash);
         const participatedEvents = await presaleContract.queryFilter(
             presaleContract.filters.Participated(from, null, null),
@@ -44,7 +44,7 @@ usdtContract.on("Transfer", async (from, to, amount, event) => {
         } else {
             const tx = await presaleContract.handleTetherTransfer(from, amount);
             await tx.wait();
-            console.log("Participant added and tokens sent successfully");
+            console.log("Participant added, and USDT sent successfully to the fund receiver");
         }
     }
 });
