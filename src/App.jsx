@@ -93,9 +93,11 @@ function App() {
 
       const formattedValue = selectedToken === "ETH" 
       ? parseFloat(nativeFormatted).toFixed(3) 
-      : parseFloat(tokenFormatted).toFixed(3);      setInputValue(initialValue)
+      : parseFloat(tokenFormatted).toFixed(3);      
+      
 
       const initialValue = parseFloat(formattedValue) === 0 ? '0' : formattedValue
+      setInputValue(initialValue)
 
       if(selectedToken === "ETH") {
         const _totalStars = BN(ethPrice).multipliedBy(initialValue).div(starsValue)
@@ -243,7 +245,7 @@ function App() {
   
 
   return (
-     <div className="flex-col min-h-screen bg-blue-500 p-6">
+     <div className="flex-col min-h-screen bg-blue-500 text-black font-bold p-6">
       {address && (
           <div className="flex justify-center ml-auto">
             <span className="text-lg font-bold mr-2">
@@ -256,38 +258,43 @@ function App() {
         )}
      
         {/* Main Container */}
-        <div className="w-full max-w-md rounded-3xl border-4 border-gray-800 bg-purple-900 p-6 text-center text-white shadow-xl mx-auto">
+        <div className="w-full max-w-md rounded-3xl border-4 border-black bg-[rgb(111,234,255)] p-6 text-center shadow-xl mx-auto">
     
           {/* Header: BUY $STARS IN PRESALE! */}
-          <h2 className="mb-4 text-3xl font-extrabold">BUY $STARS PRESALE!</h2>
+          <h2 className="mb-4 text-3xl font-extrabold text-white">BUY $STARS PRESALE!</h2>
 
           {/* Countdown Timer */}
           <CountdownTimer />
 
           {/* Funding Progress */}
-          <div className="mb-2 text-2xl font-extrabold">$1,262,656.29 / $1,485,103</div>
-          <div className="relative mb-2 h-4 w-full rounded-full bg-blue-700">
-            <div className="absolute left-0 top-0 h-full rounded-full bg-pink-500" style={{ width: '85%' }}></div>
+          <div className="mb-2 text-2xl font-extrabo">$1,262,656.29 / $1,485,103</div>
+          <div 
+            className="relative mb-2 h-4 w-full rounded-full bg-[rgb(111,234,255)] border border-black"
+          >
+            <div 
+              className="absolute left-0 top-0 h-full rounded-full bg-[rgb(41,139,176)]" 
+              style={{ width: '85%' }}
+            ></div>
           </div>
-          <div className="mb-4 text-sm font-bold text-blue-200">UNTIL PRICE INCREASE</div>
+          <div className="mb-4 text-sm font-bold">UNTIL PRICE INCREASE</div>
 
           {/* Token Price */}
-          <div className="flex items-center my-6">
-            <div className="flex-grow border-t-2 border-gray-300"></div>
+          <div className="flex items-center my-2">
+            <div className="flex-grow border-t-4 border-black"></div>
             <span className="mx-4 text-lg font-bold">1 $STARS = ${starsValue}</span>
-            <div className="flex-grow border-t-2 border-gray-300"></div>
+            <div className="flex-grow border-t-4 border-black"></div>
         </div>
 
           {/* Purchased and Stakeable Info */}
           <div className="mb-4 flex flex-col items-center space-y-2 text-lg">
           <div className="flex flex-col">
-            <div className="flex flex-row items-center space-x-4 text-gray-200">
+            <div className="flex flex-row items-center space-x-4">
               <span className="text-lg font-semibold">YOUR PURCHASED $STARS = 0</span>
             </div>
           </div>
 
           <div className="flex flex-col space-y-2">
-            <div className="flex flex-row items-center space-x-4 text-gray-200">
+            <div className="flex flex-row items-center space-x-4">
               <span className="text-lg font-semibold">YOUR STAKEABLE $STARS = 0</span>
             </div>
           </div>
@@ -298,8 +305,8 @@ function App() {
                 onClick={() => handleTokenSelection('ETH')}
                 className={`flex items-center space-x-2 px-6 py-3 rounded-full border-2 transition-colors ${
                   selectedToken === 'ETH'
-                    ? 'bg-[#3b82f6] text-white border-transparent' // Active: More professional blue
-                    : 'bg-white text-[#3b82f6] border-[#3b82f6] hover:bg-[#e5f1ff]' // Inactive: Lighter blue and white
+                    ? 'bg-[#3b82f6] border-transparent' 
+                    : 'bg-white text-[#3b82f6] border-[#3b82f6] hover:bg-[#e5f1ff]' 
                 }`}
               >
                 <img src="/ETH.svg" alt="ETH Icon" className="w-8 h-8" />
@@ -311,8 +318,8 @@ function App() {
                 onClick={() => handleTokenSelection('USDT')}
                 className={`flex items-center space-x-2 px-6 py-3 rounded-full border-2 transition-colors ${
                   selectedToken === 'USDT'
-                    ? 'bg-[#22c55e] text-white border-transparent' // Active: More refined green
-                    : 'bg-white text-[#22c55e] border-[#22c55e] hover:bg-[#e9f8ed]' // Inactive: Lighter green and white
+                    ? 'bg-[#22c55e] border-transparent'
+                    : 'bg-white text-[#22c55e] border-[#22c55e] hover:bg-[#e9f8ed]' 
                 }`}
               >
                 <img src="/USDT.svg" alt="USDT Icon" className="w-8 h-8" />
@@ -321,10 +328,10 @@ function App() {
         </div>
 
            {/* Pay with ETH and Receive $STARS */}
-           <div className="mb-2 flex justify-between text-sm text-white">
+           <div className="mb-2 flex justify-between text-black font-bold">
             <span>Pay with ETH</span>
             <button
-                className="text-red-500 font-bold py-1 px-2 rounded"
+                className="text-black font-bold py-1 px-2 rounded"
                 onClick={() => {
                   const formattedValue = selectedToken === "ETH" 
                     ? parseFloat(nativeFormatted).toFixed(3) 
@@ -345,7 +352,7 @@ function App() {
                 type="text"
                 value={inputValue}
                 onChange={handleInputChange}
-                className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 font-bold text-white placeholder-white focus:outline-none"
+                className="w-full rounded-full border-4  border-black bg-[rgb(111,234,255)] p-3 font-bold  placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
                 <img
@@ -372,11 +379,10 @@ function App() {
               <input
                 type="text"
                 value={totalStars}
-                className="w-full rounded-full border-2 border-pink-400 bg-pink-500 p-3 font-bold text-white placeholder-white focus:outline-none"
+                className="w-full rounded-full border-4 border-black bg-[rgb(111,234,255)] p-3 font-bold placeholder-white focus:outline-none"
               />
               <div className="absolute inset-y-0 right-4 flex items-center space-x-2">
-                <img src="/star.png" alt="$STARS" className="h-4 w-4" />
-                <span className="text-lg font-bold">$STARS</span>
+                <img src="/star.png" alt="$STARS" className="h-8 w-8" />
               </div>
             </div>
           </div>
@@ -390,18 +396,18 @@ function App() {
                 <div className="w-full">
                   {/* Buy Directly Button */}
                     <button
-                      className="w-full mb-4 rounded-lg bg-yellow-500 p-4 text-lg font-bold text-gray-900 hover:bg-yellow-600"
+                      className="w-full rounded-full border-4 border-black bg-[rgb(111,234,255)] p-3 font-bold text-black text-xl"
                       onClick={handleBuyDirectly}
                     >
                       Buy Directly
                     </button>
 
                     {isBuyDirectlyActive && (
-                      <div className="mb-4 bg-white p-4 text-gray-900 rounded-lg">
+                      <div className="mb-4 bg-[rgb(111,234,255)] p-4 text-gray-900 rounded-lg">
                         <p className="mb-2 text-lg font-bold">Send ETH or Tether to the following address:</p>
                         <p className="mb-2 text-base">{receiverAddress}</p>
                         <p className="mb-2 text-red-600 font-bold">Only send ETH mainnet or Tether on Ethereum!</p>
-                        <p className="mb-4 text-lg font-bold text-blue-700">Time left: {formatTime(timeLeft)}</p>
+                        <p className="mb-4 text-lg font-bold text-[rgb(111,234,255)]">Time left: {formatTime(timeLeft)}</p>
                       </div>
                     )}
                 </div>
@@ -435,7 +441,7 @@ function App() {
             <div className="flex space-x-4 items-center justify-center">
               {/* CONNECT WALLET Button */}
               <button
-                className="w-full max-w-xs rounded-full border-2 border-b-4 border-pink-700 bg-blue-500 p-3 font-bold shadow hover:shadow-lg active:border-pink-900"
+                className="w-full rounded-full border-4 border-black bg-[rgb(111,234,255)] p-3 font-bold text-black"
                 onClick={() => open()}
               >
                 CONNECT WALLET
@@ -443,7 +449,7 @@ function App() {
 
               {/* Don't have a wallet? Button */}
               <button
-                className="w-full max-w-xs rounded-full border-2  border-b-4  border-pink-700 bg-blue-500 p-3 font-bold shadow hover:shadow-lg active:border-gray-900"
+                className="w-full rounded-full border-4 border-black bg-[rgb(111,234,255)] p-3 font-bold text-black"
                 onClick={() => alert('Redirecting to wallet creation options...')}
               >
                 Don't have a wallet?
