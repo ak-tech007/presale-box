@@ -24,29 +24,26 @@ const CountdownTimer = () => {
   }, [targetDate]);
 
   return (
-    <div className='flex-col rounded-full bg-[rgb(41,139,176)] border-b-4 border-black mb-4'>
-       <div className="flex justify-between rounded-xl border-4 border-black bg-[rgb(111,234,255)] text-white p-4 text-center text-lg font-extrabold">
-          <div>
+      <div className="mb-4 flex justify-between rounded-xl border-4 text-white border-black bg-[rgb(111,234,255)] p-4 text-center text-lg font-extrabold">
+        <div>
           <p className="text-xl">DAYS</p>
-            <p className="text-xl">{days < 10 ? `0${days}` : days}</p>
-           
-          </div>
-          <div>
-            <p className="text-xl">HOURS</p>
-            <p className="text-xl">{hours < 10 ? `0${hours}` : hours}</p>
-          </div>
-          <div>
-            <p className="text-xl">MINUTES</p>
-            <p className="text-xl">{minutes < 10 ? `0${minutes}` : minutes}</p>
-          </div>
-          <div>
-            <p className="text-xl">SECONDS</p>
-            <p className="text-xl">{seconds < 10 ? `0${seconds}` : seconds}</p>
-          </div>
-
-      </div>
-      <div className="text-sm  font-medium rounded-xl  text-white ">UNTIL PRICE INCREASE</div>
-    </div>
+          <p className="text-xl">{days < 10 ? `0${days}` : days}</p>
+          
+        </div>
+        <div>
+          <p className="text-xl">HOURS</p>
+          <p className="text-xl">{hours < 10 ? `0${hours}` : hours}</p>
+        </div>
+        <div>
+          <p className="text-xl">MINUTES</p>
+          <p className="text-xl">{minutes < 10 ? `0${minutes}` : minutes}</p>
+        </div>
+        <div>
+          <p className="text-xl">SECONDS</p>
+          <p className="text-xl">{seconds < 10 ? `0${seconds}` : seconds}</p>
+        </div>
+     </div>
+      
    
   );
 };
