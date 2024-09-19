@@ -276,7 +276,6 @@ function App() {
               style={{ width: '85%' }}
             ></div>
           </div>
-          <div className="mb-4 text-sm font-bold">UNTIL PRICE INCREASE</div>
 
           {/* Token Price */}
           <div className="flex items-center my-2">
