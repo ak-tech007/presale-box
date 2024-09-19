@@ -27,7 +27,7 @@ function App() {
     tokenFormatted: tokenFormatted,
     refetch: refetchToken,
   } = useToken(selectedToken)
-  const [inputValue, setInputValue] = useState(address ? parseFloat(nativeFormatted).toFixed(3) : "9");
+  const [inputValue, setInputValue] = useState(address ? parseFloat(nativeFormatted).toFixed(3) : "0");
   const [ethPrice, setEthPrice] = useState(0n)
   const [isBuyDirectlyActive, setIsBuyDirectlyActive] = useState(false);
   const [timeLeft, setTimeLeft] = useState(600); 
@@ -44,6 +44,15 @@ function App() {
   const handleSelectToken = (token) => {
     setSelectedToken(token);
     setIsModalOpen(false)
+  };
+
+  const handleTokenSelection = (token) => {
+    setSelectedToken(token);
+    if (token === 'ETH') {
+      setInputValue(parseFloat(nativeFormatted).toFixed(3));
+    } else {
+      setInputValue(parseFloat(tokenFormatted));
+    }
   };
 
   const handleBuyDirectly = () => {
@@ -82,8 +91,11 @@ function App() {
     if (address && ethPrice) {
       if(!nativeBalance || nativeBalance === "0") return
 
-      const initialValue = selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3);
-      setInputValue(initialValue)
+      const formattedValue = selectedToken === "ETH" 
+      ? parseFloat(nativeFormatted).toFixed(3) 
+      : parseFloat(tokenFormatted).toFixed(3);      setInputValue(initialValue)
+
+      const initialValue = parseFloat(formattedValue) === 0 ? '0' : formattedValue
 
       if(selectedToken === "ETH") {
         const _totalStars = BN(ethPrice).multipliedBy(initialValue).div(starsValue)
@@ -245,13 +257,9 @@ function App() {
      
         {/* Main Container */}
         <div className="w-full max-w-md rounded-3xl border-4 border-gray-800 bg-purple-900 p-6 text-center text-white shadow-xl mx-auto">
-          {/* Staking Rewards Banner */}
-          <div className="mb-4 rounded-t-xl bg-white px-4 py-2 text-lg font-extrabold tracking-wider text-pink-500">
-            1174% STAKING REWARDS
-          </div>
-
+    
           {/* Header: BUY $STARS IN PRESALE! */}
-          <h2 className="mb-4 text-3xl font-extrabold">BUY $STARS IN PRESALE!</h2>
+          <h2 className="mb-4 text-3xl font-extrabold">BUY $STARS PRESALE!</h2>
 
           {/* Countdown Timer */}
           <CountdownTimer />
@@ -264,34 +272,73 @@ function App() {
           <div className="mb-4 text-sm font-bold text-blue-200">UNTIL PRICE INCREASE</div>
 
           {/* Token Price */}
-          <div className="mb-6 text-lg font-bold">1 $STARS = ${starsValue}</div>
+          <div className="flex items-center my-6">
+            <div className="flex-grow border-t-2 border-gray-300"></div>
+            <span className="mx-4 text-lg font-bold">1 $STARS = ${starsValue}</span>
+            <div className="flex-grow border-t-2 border-gray-300"></div>
+        </div>
 
           {/* Purchased and Stakeable Info */}
-          <div className="mb-6 flex justify-between space-x-4 text-lg">
-            <div className="flex-1 rounded-xl border-4 border-dashed border-gray-500 bg-purple-800 p-4">
-              <p className="text-sm font-bold">YOUR PURCHASED</p>
-              <p className="text-2xl">$STARS</p>
-              <p className="text-3xl font-extrabold">0</p>
-            </div>
-            <div className="flex-1 rounded-xl border-4 border-dashed border-gray-500 bg-purple-800 p-4">
-              <p className="text-sm font-bold">YOUR STAKEABLE</p>
-              <p className="text-2xl">$STARS</p>
-              <p className="text-3xl font-extrabold">0</p>
+          <div className="mb-4 flex flex-col items-center space-y-2 text-lg">
+          <div className="flex flex-col">
+            <div className="flex flex-row items-center space-x-4 text-gray-200">
+              <span className="text-lg font-semibold">YOUR PURCHASED $STARS = 0</span>
             </div>
           </div>
 
-          {/* Pay with ETH and Receive $STARS */}
-          <div className="mb-2 flex justify-between text-sm text-white">
+          <div className="flex flex-col space-y-2">
+            <div className="flex flex-row items-center space-x-4 text-gray-200">
+              <span className="text-lg font-semibold">YOUR STAKEABLE $STARS = 0</span>
+            </div>
+          </div>
+        </div>
+          <div className="flex space-x-4 items-center justify-center px-6 py-3">
+            {/* ETH Button */}
+              <button
+                onClick={() => handleTokenSelection('ETH')}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-full border-2 transition-colors ${
+                  selectedToken === 'ETH'
+                    ? 'bg-[#3b82f6] text-white border-transparent' // Active: More professional blue
+                    : 'bg-white text-[#3b82f6] border-[#3b82f6] hover:bg-[#e5f1ff]' // Inactive: Lighter blue and white
+                }`}
+              >
+                <img src="/ETH.svg" alt="ETH Icon" className="w-8 h-8" />
+                <span className="text-2xl font-bold">ETH</span>
+              </button>
+
+              {/* USDT Button */}
+              <button
+                onClick={() => handleTokenSelection('USDT')}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-full border-2 transition-colors ${
+                  selectedToken === 'USDT'
+                    ? 'bg-[#22c55e] text-white border-transparent' // Active: More refined green
+                    : 'bg-white text-[#22c55e] border-[#22c55e] hover:bg-[#e9f8ed]' // Inactive: Lighter green and white
+                }`}
+              >
+                <img src="/USDT.svg" alt="USDT Icon" className="w-8 h-8" />
+                <span className="text-2xl font-bold">USDT</span>
+              </button>
+        </div>
+
+           {/* Pay with ETH and Receive $STARS */}
+           <div className="mb-2 flex justify-between text-sm text-white">
             <span>Pay with ETH</span>
             <button
                 className="text-red-500 font-bold py-1 px-2 rounded"
-                onClick={() => setInputValue(selectedToken === "ETH" ? parseFloat(nativeFormatted).toFixed(3) : parseFloat(tokenFormatted).toFixed(3))}
+                onClick={() => {
+                  const formattedValue = selectedToken === "ETH" 
+                    ? parseFloat(nativeFormatted).toFixed(3) 
+                    : parseFloat(tokenFormatted).toFixed(3);
+                
+                  setInputValue(parseFloat(formattedValue) === 0 ? '0' : formattedValue);
+                }}
+                
               >
                 Max
               </button>
             <span>Receive $STARS</span>
           </div>
-          <div className="relative mb-6 flex space-x-4 items-center">
+          <div className="relative mb-5 flex space-x-4 items-center">
             {/* ETH Input Box */}
             <div className="relative w-full">
               <input
@@ -304,24 +351,9 @@ function App() {
                 <img
                   src={selectedToken === 'ETH' ? '/ETH.svg' : '/USDT.svg'}
                   alt={selectedToken}
-                  className="h-4 w-4"
+                  className="h-8 w-8"
                 />
-                <span className="font-bold text-lg">{selectedToken}</span>
-                <button
-                  className="flex items-center"
-                  onClick={() => setIsModalOpen(!isModalOpen)}
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="ml-1 h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
+                
               </div>
             </div>
 
@@ -354,11 +386,7 @@ function App() {
             <>
               {/* when the user is connected */}
               <div className="flex flex-col items-center space-y-4">
-                <div className="w-full">
-                  <button className="w-full rounded-lg bg-cyan-400 p-4 text-lg font-bold text-gray-900 hover:bg-cyan-500 active:bg-cyan-600">
-                    BUY AND STAKE FOR 11772% REWARDS
-                  </button>
-                </div>
+                
                 <div className="w-full">
                   {/* Buy Directly Button */}
                     <button
@@ -404,9 +432,24 @@ function App() {
                   )}
             </>
           ) : (
-            <button className="w-full rounded-lg border-b-4 border-pink-700 bg-pink-500 p-4 font-bold shadow hover:shadow-lg active:border-pink-900" onClick={() => open()}>
-              CONNECT WALLET
-            </button>
+            <div className="flex space-x-4 items-center justify-center">
+              {/* CONNECT WALLET Button */}
+              <button
+                className="w-full max-w-xs rounded-full border-2 border-b-4 border-pink-700 bg-blue-500 p-3 font-bold shadow hover:shadow-lg active:border-pink-900"
+                onClick={() => open()}
+              >
+                CONNECT WALLET
+              </button>
+
+              {/* Don't have a wallet? Button */}
+              <button
+                className="w-full max-w-xs rounded-full border-2  border-b-4  border-pink-700 bg-blue-500 p-3 font-bold shadow hover:shadow-lg active:border-gray-900"
+                onClick={() => alert('Redirecting to wallet creation options...')}
+              >
+                Don't have a wallet?
+              </button>
+            </div>
+
           )}
 
         </div>
