@@ -24,7 +24,7 @@ const CountdownTimer = () => {
   }, [targetDate]);
 
   return (
-      <div className="mb-4 flex justify-between rounded-xl border-4 text-white border-black bg-[rgb(111,234,255)] p-4 text-center text-lg font-extrabold">
+      <div className="mb-4 flex justify-between rounded-xl border-4 text-black border-black bg-[rgb(111,234,255)] p-4 text-center text-lg font-extrabold">
         <div>
           <p className="text-xl">DAYS</p>
           <p className="text-xl">{days < 10 ? `0${days}` : days}</p>
