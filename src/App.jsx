@@ -245,7 +245,7 @@ function App() {
   
 
   return (
-     <div className="flex-col min-h-screen bg-blue-500 text-black font-bold p-6">
+     <div className="flex-col min-h-screen text-black font-bold p-6">
       {address && (
           <div className="flex justify-center ml-auto">
             <span className="text-lg font-bold mr-2">
