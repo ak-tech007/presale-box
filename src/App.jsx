@@ -245,7 +245,7 @@ function App() {
   
 
   return (
-     <div className="flex-col min-h-screen bg-blue-500 text-black font-bold p-6">
+     <div className="flex-col min-h-screen text-black font-bold p-6">
       {address && (
           <div className="flex justify-center ml-auto">
             <span className="text-lg font-bold mr-2">
@@ -261,7 +261,7 @@ function App() {
         <div className="w-full max-w-md rounded-3xl border-4 border-black bg-[rgb(111,234,255)] p-6 text-center shadow-xl mx-auto">
     
           {/* Header: BUY $STARS IN PRESALE! */}
-          <h2 className="mb-4 text-3xl font-extrabold text-white">BUY $STARS PRESALE!</h2>
+          <h2 className="mb-4 text-3xl font-extrabold text-black">BUY $STARS PRESALE!</h2>
 
           {/* Countdown Timer */}
           <CountdownTimer />
@@ -273,7 +273,7 @@ function App() {
               className="absolute left-0 top-0 h-full rounded-full bg-[rgb(41,139,176)]" 
               style={{ width: '85%' }}
             ></div>
-            <div className="absolute inset-0 flex items-center justify-center text-base text-white">
+            <div className="absolute inset-0 flex items-center justify-center text-base text-black">
               UNTIL PRICE INCREASE
             </div>
           </div>
